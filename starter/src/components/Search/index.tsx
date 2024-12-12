@@ -1,6 +1,5 @@
 import React from "react";
 import Book from "../Book";
-import "../../App.css";
 import * as BooksAPI from "../../BooksAPI";
 import { BookDetails } from "../../interfaces/BookInterfaces";
 import { Link } from "react-router-dom";
@@ -19,10 +18,13 @@ const Search = ({ query }: SearchProps) => {
 
   const updateQuery = (newQuery: string) => {
     if (newQuery !== query) {
-      setState({ query: newQuery, searchResults: [] });
+      setState((prevState) => ({ ...prevState, query: newQuery }));
       if (newQuery.length > 1) {
         //Returned a 403 error on searching a query with a single character
-        searchBooks(newQuery.trim());
+        searchBooks(newQuery.trim()).catch((error: Error) => {
+          console.error("Error searching books:", error);
+          // Optionally, you can set an error state to display a message to the user
+        });
       }
     }
   };
@@ -33,18 +35,18 @@ const Search = ({ query }: SearchProps) => {
   ) => {
     const newShelf = event.target.value;
     BooksAPI.update(book, newShelf).then(() => {
-      setState({
-        ...state,
-        searchResults: state.searchResults.map((b) =>
+      setState((prevState) => ({
+        ...prevState,
+        searchResults: prevState.searchResults.map((b) =>
           b.id === book.id ? { ...b, shelf: newShelf } : b
         ),
-      });
+      }));
     });
   };
 
-  const searchBooks = (query: string) => {
-    BooksAPI.search(query, 20).then(
-      (searchResults: BookDetails[] | undefined) => {
+  const searchBooks = (query: string): Promise<void> => {
+    return BooksAPI.search(query, 20)
+      .then((searchResults: BookDetails[] | undefined) => {
         if (searchResults) {
           searchResults.forEach((b) => {
             const matchedBook = searchResults.find((book) => book.id === b.id);
@@ -53,10 +55,13 @@ const Search = ({ query }: SearchProps) => {
             }
           });
           searchResults.sort((a, b) => a.title.localeCompare(b.title));
-          setState({ ...state, searchResults });
+          setState((prevState) => ({ ...prevState, searchResults }));
         }
-      }
-    );
+      })
+      .catch((error) => {
+        console.error("Error searching books:", error);
+        // Optionally, you can set an error state to display a message to the user
+      });
   };
 
   return (
@@ -65,14 +70,14 @@ const Search = ({ query }: SearchProps) => {
         <Link className="close-search" to={`/`}>
           Close
         </Link>
-       
-          <TextField
-            variant="outlined"
-            placeholder="Search by title or author"
-            value={state.query}
-            onChange={(event) => updateQuery(event.target.value)}
-            fullWidth
-          />
+
+        <TextField
+          variant="outlined"
+          placeholder="Search by title or author"
+          value={state.query}
+          onChange={(event) => updateQuery(event.target.value)}
+          fullWidth
+        />
       </div>
       <div className="search-books-results">
         <Grid container spacing={3}>
