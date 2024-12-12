@@ -59,7 +59,9 @@ const App = () => {
         />
         <Route
           path="/search"
-          element={<Search searchResults={[]} query="" />}
+           element={
+            <Search searchResults={[]} query="" onUpdateShelf={updateShelf} />
+          }
         />
       </Routes>
     </div>
