@@ -13,6 +13,12 @@ interface ShelfProps {
 }
 
 const Shelf = ({ books, title, onUpdateShelf }: ShelfProps) => {
+  const handleChange = (
+    book: BookDetails,
+    event: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    onUpdateShelf(book, event);
+  };
   return (
     <div className="bookshelf">
       <Box component="h2">
@@ -23,7 +29,7 @@ const Shelf = ({ books, title, onUpdateShelf }: ShelfProps) => {
         <Grid container spacing={2}>
           {books.map((book) => (
             <Grid item xs={12} sm={8} md={4} lg={2} key={book.id}>
-              <Book book={book} onUpdateShelf={onUpdateShelf} />
+              <Book book={book} onUpdateShelf={handleChange} />
             </Grid>
           ))}
         </Grid>
