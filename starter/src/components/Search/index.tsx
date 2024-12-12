@@ -8,9 +8,13 @@ import { Grid, TextField } from "@mui/material";
 interface SearchProps {
   searchResults: BookDetails[];
   query: string;
+  onUpdateShelf: (
+    book: BookDetails,
+    event: React.ChangeEvent<HTMLSelectElement>
+  ) => void;
 }
 
-const Search = ({ query }: SearchProps) => {
+const Search = ({ query, onUpdateShelf }: SearchProps) => {
   const [state, setState] = React.useState<{
     query: string;
     searchResults: BookDetails[];
@@ -27,21 +31,6 @@ const Search = ({ query }: SearchProps) => {
         });
       }
     }
-  };
-
-  const onUpdateShelf = (
-    book: BookDetails,
-    event: React.ChangeEvent<HTMLSelectElement>
-  ) => {
-    const newShelf = event.target.value;
-    BooksAPI.update(book, newShelf).then(() => {
-      setState((prevState) => ({
-        ...prevState,
-        searchResults: prevState.searchResults.map((b) =>
-          b.id === book.id ? { ...b, shelf: newShelf } : b
-        ),
-      }));
-    });
   };
 
   const searchBooks = (query: string): Promise<void> => {
