@@ -65,7 +65,7 @@ const Search = ({ query }: SearchProps) => {
         <Link className="close-search" to={`/`}>
           Close
         </Link>
-        <div className="search-books-input-wrapper">
+       
           <TextField
             variant="outlined"
             placeholder="Search by title or author"
@@ -73,7 +73,6 @@ const Search = ({ query }: SearchProps) => {
             onChange={(event) => updateQuery(event.target.value)}
             fullWidth
           />
-        </div>
       </div>
       <div className="search-books-results">
         <Grid container spacing={3}>
