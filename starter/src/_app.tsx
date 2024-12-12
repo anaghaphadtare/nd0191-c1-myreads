@@ -35,7 +35,15 @@ const App = () => {
       setBooks((prevBooks) =>
         prevBooks
           ? prevBooks.map((b) =>
-              b.id === book.id ? { ...b, shelf: newShelf } : b
+              b.id === book.id
+                ? {
+                    ...b,
+                    shelf: newShelf,
+                    authors: book.authors,
+                    title: book.title,
+                    imageLinks: book.imageLinks,
+                  }
+                : b
             )
           : prevBooks
       );
