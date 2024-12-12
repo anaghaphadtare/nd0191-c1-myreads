@@ -26,7 +26,7 @@ const Shelf = ({ books, title, onUpdateShelf }: ShelfProps) => {
         <Divider orientation="horizontal" aria-hidden="true" />
       </Box>
       <Box className="bookshelf-books">
-        <Grid container spacing={2}>
+        <Grid container spacing={2} justifyContent="center">
           {books.map((book) => (
             <Grid item xs={12} sm={8} md={4} lg={2} key={book.id}>
               <Book book={book} onUpdateShelf={handleChange} />
