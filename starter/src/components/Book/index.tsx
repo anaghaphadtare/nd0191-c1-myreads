@@ -41,23 +41,18 @@ const Book = ({ book, onUpdateShelf }: BookProps) => {
                     <option value="moveTo" disabled>
                       Move to...
                     </option>
-                    <option
-                      value="currentlyReading"
-                      selected={book?.shelf === "currentlyReading"}
-                    >
-                      Currently Reading
+                    <option value="currentlyReading">
+                      {book?.shelf === "currentlyReading" ? "✓ " : ""}Currently
+                      Reading
                     </option>
-                    <option
-                      value="wantToRead"
-                      selected={book?.shelf === "wantToRead"}
-                    >
-                      Want to Read
+                    <option value="wantToRead">
+                      {book?.shelf === "wantToRead" ? "✓ " : ""}Want to Read
                     </option>
-                    <option value="read" selected={book?.shelf === "read"}>
-                      Read
+                    <option value="read">
+                      {book?.shelf === "read" ? "✓ " : ""}Read
                     </option>
-                    <option value="none" selected={book?.shelf === "none"}>
-                      None
+                    <option value="none">
+                      {book?.shelf === "none" ? "✓ " : ""}None
                     </option>
                   </select>
                 </div>
