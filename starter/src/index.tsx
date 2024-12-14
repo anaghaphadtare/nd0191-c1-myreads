@@ -6,7 +6,12 @@ import App from "./_app";
 const rootElement = document.getElementById("root");
 const root = ReactDOMClient.createRoot(rootElement!);
 root.render(
-  <BrowserRouter>
+  <BrowserRouter
+    future={{
+      v7_startTransition: true,
+      v7_relativeSplatPath: true,
+    }}
+  >
     <App />
   </BrowserRouter>
 );
