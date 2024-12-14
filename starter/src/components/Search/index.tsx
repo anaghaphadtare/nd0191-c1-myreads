@@ -20,8 +20,15 @@ const Search = ({ query, onUpdateShelf }: SearchProps) => {
     searchResults: BookDetails[];
   }>({ query: "", searchResults: [] });
 
-  const updateQuery = (newQuery: string) => {
-    if (newQuery !== query) {
+const updateQuery = (newQuery: string) => {
+    //Added a check to see if the query is empty and reset the search results
+    if (newQuery.trim().length === 0) {
+      setState((prevState) => ({
+        ...prevState,
+        query: newQuery,
+        searchResults: [],
+      }));
+    } else if (newQuery !== query) {
       setState((prevState) => ({ ...prevState, query: newQuery }));
       if (newQuery.length > 1) {
         //Returned a 403 error on searching a query with a single character
