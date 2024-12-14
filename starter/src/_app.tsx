@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import "./App.css";
 import * as BooksAPI from "./BooksAPI";
 import ListBooks from "./components/ListBooks";
@@ -50,6 +50,9 @@ const App = () => {
     });
   };
 
+  const [searchResults] = useState<BookDetails[]>([]);
+  const [query] = useState<string>("");
+
   return (
     <div className="app">
       <Routes>
@@ -59,8 +62,12 @@ const App = () => {
         />
         <Route
           path="/search"
-           element={
-            <Search searchResults={[]} query="" onUpdateShelf={updateShelf} />
+          element={
+            <Search
+              searchResults={searchResults}
+              query={query}
+              onUpdateShelf={updateShelf}
+            />
           }
         />
       </Routes>
