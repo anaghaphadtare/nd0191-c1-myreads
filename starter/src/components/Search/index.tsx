@@ -4,6 +4,7 @@ import * as BooksAPI from "../../BooksAPI";
 import { BookDetails } from "../../interfaces/BookInterfaces";
 import { Link } from "react-router-dom";
 import { Grid, TextField } from "@mui/material";
+import { debounce, throttle } from "lodash";
 
 interface SearchProps {
   searchResults: BookDetails[];
@@ -20,7 +21,7 @@ const Search = ({ query, onUpdateShelf }: SearchProps) => {
     searchResults: BookDetails[];
   }>({ query: "", searchResults: [] });
 
-const updateQuery = (newQuery: string) => {
+  const updateQuery = (newQuery: string) => {
     //Added a check to see if the query is empty and reset the search results
     if (newQuery.trim().length === 0) {
       setState((prevState) => ({
@@ -32,35 +33,40 @@ const updateQuery = (newQuery: string) => {
       setState((prevState) => ({ ...prevState, query: newQuery }));
       if (newQuery.length > 1) {
         //Returned a 403 error on searching a query with a single character
-        searchBooks(newQuery.trim()).catch((error: Error) => {
-          console.error("Error searching books:", error);
-          // Optionally, you can set an error state to display a message to the user
-        });
+        debouncedSearchBooks(newQuery);
       }
     }
   };
 
   const searchBooks = async (query: string): Promise<void> => {
-    return BooksAPI.search(query, 100)
-      .then(async (searchResults: BookDetails[] | undefined) => {
-        if (searchResults) {
-          const updatedResults = searchResults.map((b) => {
-            return BooksAPI.get(b.id).then((bookDetails) => {
-              if (bookDetails) {
-                b.shelf = bookDetails.shelf;
-              }
-              return b;
-            });
-          });
-          const results = await Promise.all(updatedResults);
-          results.sort((a, b) => a.title.localeCompare(b.title));
-          setState((prevState) => ({ ...prevState, searchResults: results }));
-        }
-      })
-      .catch((error) => {
-        console.error("Error searching books:", error);
-      });
+    try {
+      const searchResults = await BooksAPI.search(query, 100);
+      if (searchResults?.length > 0) {
+        const updatedResults = await Promise.all(
+          searchResults.map(async (b) => {
+            const bookDetails = await BooksAPI.get(b.id);
+            if (bookDetails) {
+              b.shelf = bookDetails.shelf;
+            }
+            return b;
+          })
+        );
+        updatedResults.sort((a, b) => a.title.localeCompare(b.title));
+        setState((prevState) => ({
+          ...prevState,
+          searchResults: updatedResults,
+        }));
+      } else {
+        console.log("No search results found.");
+        setState((prevState) => ({ ...prevState, searchResults: [] }));
+      }
+    } catch (error) {
+      console.error("Error searching books:", error);
+    }
   };
+
+  const debouncedSearchBooks = debounce(searchBooks, 500); //.5 sec debounce
+  const throttledUpdateQuery = throttle(updateQuery, 500); //.5 sec throttle
 
   const onSearchUpdateShelf = (
     book: BookDetails,
@@ -75,6 +81,7 @@ const updateQuery = (newQuery: string) => {
     setState((prevState) => ({ ...prevState, searchResults: updatedBooks }));
     onUpdateShelf(book, event);
   };
+
   return (
     <div className="search-books">
       <div className="search-books-bar">
@@ -86,7 +93,7 @@ const updateQuery = (newQuery: string) => {
           variant="outlined"
           placeholder="Search by title or author"
           value={state.query}
-          onChange={(event) => updateQuery(event.target.value)}
+          onChange={(event) => throttledUpdateQuery(event.target.value)}
           fullWidth
         />
       </div>
