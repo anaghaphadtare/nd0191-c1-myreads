@@ -40,6 +40,11 @@ To get started with the project, follow these steps:
 3. Install the dependencies:
     ```bash
     npm install
+        
+    For Lodash
+    $ npm i -g npm
+    $ npm i --save lodash
+
     ```
 
 ## Usage
